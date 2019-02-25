@@ -3,7 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
+	"github.com/AMCCG/project-2-backend-golang/constant"
 	"github.com/AMCCG/project-2-backend-golang/structure"
 )
 
@@ -11,40 +13,60 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case http.MethodGet:
-		getAllUsers(w, r)
+		id := strings.TrimPrefix(r.URL.Path, constant.UsersURL)
+		if id != "" {
+			get(w, r)
+		} else {
+			getAll(w, r)
+		}
 	case http.MethodPost:
-		addUsers(w, r)
+		add(w, r)
 	case http.MethodPut:
-		updateUsers(w, r)
+		update(w, r)
 	case http.MethodDelete:
-		deleteUsers(w, r)
+		delete(w, r)
 	default:
 		redirect(w, r)
 	}
 }
 
-func getAllUsers(w http.ResponseWriter, r *http.Request) {
+func getAll(w http.ResponseWriter, r *http.Request) {
+	var res = []structure.User{}
+	res = append(res, structure.User{Name: "Apisit", LastName: "AMCCG"})
+	res = append(res, structure.User{Name: "Apisit", LastName: "AMCCG"})
+	res = append(res, structure.User{Name: "Apisit", LastName: "AMCCG"})
+	res = append(res, structure.User{Name: "Apisit", LastName: "AMCCG"})
 	var response structure.ResponseApi
 	response.Status = "success"
 	response.Code = http.StatusOK
+	response.Content = res
 	json.NewEncoder(w).Encode(response)
 }
 
-func addUsers(w http.ResponseWriter, r *http.Request) {
+func get(w http.ResponseWriter, r *http.Request) {
+	users := structure.User{Name: "Apisit", LastName: "AMCCG"}
+	var response structure.ResponseApi
+	response.Status = "success"
+	response.Code = http.StatusOK
+	response.Content = users
+	json.NewEncoder(w).Encode(response)
+}
+
+func add(w http.ResponseWriter, r *http.Request) {
 	var response structure.ResponseApi
 	response.Status = "create success"
 	response.Code = http.StatusCreated
 	json.NewEncoder(w).Encode(response)
 }
 
-func updateUsers(w http.ResponseWriter, r *http.Request) {
+func update(w http.ResponseWriter, r *http.Request) {
 	var response structure.ResponseApi
 	response.Status = "update success"
 	response.Code = http.StatusOK
 	json.NewEncoder(w).Encode(response)
 }
 
-func deleteUsers(w http.ResponseWriter, r *http.Request) {
+func delete(w http.ResponseWriter, r *http.Request) {
 	var response structure.ResponseApi
 	response.Status = "delete success"
 	response.Code = http.StatusOK
