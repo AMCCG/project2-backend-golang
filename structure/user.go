@@ -1,6 +1,8 @@
 package structure
 
 type User struct {
-	Name     string
-	LastName string
+	// Id        bson.ObjectId `bson:"_id,omitempty"`
+	Id        string `bson:"_id,omitempty"`
+	FirstName string
+	LastName  string
 }
