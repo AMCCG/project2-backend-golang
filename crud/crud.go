@@ -6,24 +6,52 @@ import (
 	"net/http"
 
 	"github.com/mongodb/mongo-go-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/AMCCG/project-2-backend-golang/structure"
 	"github.com/AMCCG/project-2-backend-golang/utils"
 	"github.com/mongodb/mongo-go-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func FindAll(entity interface{}) structure.ResponseApi {
 	var response structure.ResponseApi
 	mongoDB := Connect()
 	var results []*structure.User
-
 	collections := mongoDB.Database("golang").Collection(utils.Reflection(entity))
-	// cur, err := collections.Aggregate(context.TODO(), entity, options.Aggregate())
-	cur, err := collections.Find(context.TODO(), entity, options.Find())
-
+	cur, err := collections.Find(context.TODO(), bson.D{}, options.Find())
 	if err != nil {
 		log.Print("query error ", err.Error())
+		response.Status = "error"
+		response.Code = http.StatusInternalServerError
+		response.Message = err.Error()
+	} else {
+		log.Print("cur ", cur.Current.Lookup("_id"))
+		for cur.Next(context.TODO()) {
+			var user structure.User
+			err := cur.Decode(&user)
+			if err != nil {
+				log.Fatal("Decode ", err)
+			}
+			results = append(results, &user)
+		}
+		response.Status = "ok"
+		response.Code = http.StatusOK
+		response.Content = results
+	}
+	defer CloseDatabase(mongoDB)
+	return response
+}
+
+func FindByID(entity interface{}) structure.ResponseApi {
+	var response structure.ResponseApi
+	mongoDB := Connect()
+	var results structure.User
+	var getUser = entity.(structure.User)
+	var filter = bson.M{"_id": getUser.ID}
+	collections := mongoDB.Database("golang").Collection(utils.Reflection(entity))
+	cur, err := collections.Find(context.TODO(), filter, options.Find())
+	if err != nil {
+		log.Print("query error : ", err.Error())
 		response.Status = "error"
 		response.Code = http.StatusInternalServerError
 		response.Message = err.Error()
@@ -32,9 +60,9 @@ func FindAll(entity interface{}) structure.ResponseApi {
 			var user structure.User
 			err := cur.Decode(&user)
 			if err != nil {
-				log.Fatal("Decode ", err)
+				log.Fatal("Decode : ", err)
 			}
-			results = append(results, &user)
+			results = user
 		}
 		response.Status = "ok"
 		response.Code = http.StatusOK

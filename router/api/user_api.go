@@ -2,8 +2,11 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
+
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 
 	"github.com/AMCCG/project-2-backend-golang/constant"
 	"github.com/AMCCG/project-2-backend-golang/crud"
@@ -14,12 +17,7 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case http.MethodGet:
-		id := strings.TrimPrefix(r.URL.Path, constant.UsersURL)
-		if id != "" {
-			get(w, r)
-		} else {
-			getAll(w, r)
-		}
+		get(w, r)
 	case http.MethodPost:
 		add(w, r)
 	case http.MethodPut:
@@ -31,29 +29,37 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getAll(w http.ResponseWriter, r *http.Request) {
-	users := structure.User{FirstName: "Apisit", LastName: "Amornchanchaigul"}
-	var response structure.ResponseApi = crud.FindAll(users)
-	json.NewEncoder(w).Encode(response)
-}
-
 func get(w http.ResponseWriter, r *http.Request) {
-	users := structure.User{FirstName: "Apisit", LastName: "AMCCG"}
+	paramID := strings.TrimPrefix(r.URL.Path, constant.UsersURL)
+	var users structure.User
 	var response structure.ResponseApi
-	response.Status = "success"
-	response.Code = http.StatusOK
-	response.Content = users
+	if paramID != "" {
+		id, err := primitive.ObjectIDFromHex(paramID)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		log.Print(id)
+		users.ID = id
+		response = crud.FindByID(users)
+	} else {
+		response = crud.FindAll(users)
+	}
 	json.NewEncoder(w).Encode(response)
 }
 
 func add(w http.ResponseWriter, r *http.Request) {
-	users := structure.User{FirstName: "Apisit", LastName: "Amornchanchaigul"}
+	decoder := json.NewDecoder(r.Body)
+	var users structure.User
+	err := decoder.Decode(&users)
+	if err != nil {
+		panic(err)
+	}
 	var response structure.ResponseApi = crud.Insert(users)
 	json.NewEncoder(w).Encode(response)
 }
 
 func update(w http.ResponseWriter, r *http.Request) {
-	users := structure.User{FirstName: "Apisit", LastName: "Amornchanchaigul"}
+	users := structure.User{FIRSTNAME: "Apisit", LASTNAME: "Amornchanchaigul"}
 	var response structure.ResponseApi = crud.Update(users)
 	json.NewEncoder(w).Encode(response)
 }
