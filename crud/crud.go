@@ -95,9 +95,9 @@ func Insert(entity interface{}) structure.ResponseApi {
 func Update(entity interface{}) structure.ResponseApi {
 	var response structure.ResponseApi
 	mongoDB := Connect()
-
-	filter := bson.M{"firstname": "Apisit"}
-	update := bson.M{"$set": bson.M{"firstname": "Tee"}}
+	var getUser = entity.(structure.User)
+	var filter = bson.M{"_id": getUser.ID}
+	update := bson.M{"$set": entity}
 
 	collections := mongoDB.Database("golang").Collection(utils.Reflection(entity))
 	updateResult, err := collections.UpdateOne(context.TODO(), filter, update)
@@ -110,7 +110,32 @@ func Update(entity interface{}) structure.ResponseApi {
 		log.Print("MatchedCount : ", updateResult.MatchedCount)
 		log.Print("ModifiedCount : ", updateResult.ModifiedCount)
 		log.Print("UpsertedID : ", updateResult.UpsertedID)
-		response.Status = "create success"
+		response.Status = "update success"
+		response.Code = http.StatusOK
+	}
+	defer CloseDatabase(mongoDB)
+	return response
+}
+
+func Delete(entity interface{}) structure.ResponseApi {
+	var response structure.ResponseApi
+	mongoDB := Connect()
+	var getUser = entity.(structure.User)
+	var filter = bson.M{"_id": getUser.ID}
+	collections := mongoDB.Database("golang").Collection(utils.Reflection(entity))
+	result, err := collections.DeleteOne(context.TODO(), filter, options.Delete())
+	if err != nil {
+		log.Print(err.Error())
+		response.Status = "error"
+		response.Code = http.StatusInternalServerError
+		response.Message = err.Error()
+	} else {
+		if result.DeletedCount == 0 {
+			response.Message = "not know entity"
+			response.Status = "success"
+		} else {
+			response.Status = "delete success"
+		}
 		response.Code = http.StatusOK
 	}
 	defer CloseDatabase(mongoDB)

@@ -36,9 +36,8 @@ func get(w http.ResponseWriter, r *http.Request) {
 	if paramID != "" {
 		id, err := primitive.ObjectIDFromHex(paramID)
 		if err != nil {
-			log.Fatal(err.Error())
+			log.Fatal("Primitive ObjectId ", err.Error())
 		}
-		log.Print(id)
 		users.ID = id
 		response = crud.FindByID(users)
 	} else {
@@ -59,15 +58,28 @@ func add(w http.ResponseWriter, r *http.Request) {
 }
 
 func update(w http.ResponseWriter, r *http.Request) {
-	users := structure.User{FIRSTNAME: "Apisit", LASTNAME: "Amornchanchaigul"}
+	decoder := json.NewDecoder(r.Body)
+	var users structure.User
+	err := decoder.Decode(&users)
+	if err != nil {
+		panic(err)
+	}
 	var response structure.ResponseApi = crud.Update(users)
 	json.NewEncoder(w).Encode(response)
 }
 
 func delete(w http.ResponseWriter, r *http.Request) {
 	var response structure.ResponseApi
-	response.Status = "delete success"
-	response.Code = http.StatusOK
+	paramID := strings.TrimPrefix(r.URL.Path, constant.UsersURL)
+	if paramID != "" {
+		var users structure.User
+		id, err := primitive.ObjectIDFromHex(paramID)
+		if err != nil {
+			log.Fatal("Primitive ObjectId ", err.Error())
+		}
+		users.ID = id
+		response = crud.Delete(users)
+	}
 	json.NewEncoder(w).Encode(response)
 }
 
