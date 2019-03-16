@@ -1,0 +1,11 @@
+FROM golang
+
+WORKDIR $GOPATH/src/github.com/AMCCG/project-2-backend-golang
+
+COPY  . .
+
+RUN go version
+
+EXPOSE 8080
+
+# CMD ["go", "run", "main.go"]

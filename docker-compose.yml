@@ -1,0 +1,21 @@
+version: '3'
+services:
+  web:
+    container_name: my-golang-backend-service
+    build: 
+      context: $GOPATH/src/github.com/AMCCG/project-2-backend-golang/
+      dockerfile: DockerFile
+    ports:
+     - "8080:8080"
+    depends_on:
+      - mongo
+    links:
+      - mongo
+    command: go run main.go
+  mongo:
+    image: "mongo"
+    ports:
+      - "27017:27017"
+    # command: ["mongod", "--rest"]
+    # command : use golang 
+    # command : db.createCollection("user")

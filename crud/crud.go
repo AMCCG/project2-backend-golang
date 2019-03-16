@@ -143,7 +143,8 @@ func Delete(entity interface{}) structure.ResponseApi {
 }
 
 func Connect() *mongo.Client {
-	mongoDB, err := mongo.Connect(context.TODO(), "mongodb://localhost:27017")
+	// mongoDB, err := mongo.Connect(context.TODO(), "mongodb://localhost:27017")
+	mongoDB, err := mongo.Connect(context.TODO(), "mongodb://mongo:27017")
 	if err != nil {
 		log.Fatal("can't connect database ", err)
 	}
