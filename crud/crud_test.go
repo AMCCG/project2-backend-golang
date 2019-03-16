@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/AMCCG/project-2-backend-golang/structure"
 )
 
 func TestInsert(t *testing.T) {

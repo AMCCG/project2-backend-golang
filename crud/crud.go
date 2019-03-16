@@ -4,13 +4,13 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"project-2-backend-golang/structure"
+	"project-2-backend-golang/utils"
 
-	"github.com/mongodb/mongo-go-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/bson"
+
 	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/AMCCG/project-2-backend-golang/structure"
-	"github.com/AMCCG/project-2-backend-golang/utils"
-	"github.com/mongodb/mongo-go-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func FindAll(entity interface{}) structure.ResponseApi {
@@ -144,7 +144,8 @@ func Delete(entity interface{}) structure.ResponseApi {
 
 func Connect() *mongo.Client {
 	// mongoDB, err := mongo.Connect(context.TODO(), "mongodb://localhost:27017")
-	mongoDB, err := mongo.Connect(context.TODO(), "mongodb://mongo:27017")
+	// mongoDB, err := mongo.Connect(context.TODO(), "mongodb://mongo:27017")
+	mongoDB, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
 		log.Fatal("can't connect database ", err)
 	}

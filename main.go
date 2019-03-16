@@ -2,10 +2,8 @@ package main
 
 import (
 	"log"
-
-	"github.com/AMCCG/project-2-backend-golang/router"
-
-	"github.com/AMCCG/project-2-backend-golang/constant"
+	"project-2-backend-golang/constant"
+	"project-2-backend-golang/router"
 )
 
 func main() {

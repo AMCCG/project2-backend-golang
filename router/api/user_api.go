@@ -8,9 +8,9 @@ import (
 
 	"github.com/mongodb/mongo-go-driver/bson/primitive"
 
-	"github.com/AMCCG/project-2-backend-golang/constant"
-	"github.com/AMCCG/project-2-backend-golang/crud"
-	"github.com/AMCCG/project-2-backend-golang/structure"
+	"project-2-backend-golang/constant"
+	"project-2-backend-golang/crud"
+	"project-2-backend-golang/structure"
 )
 
 func UserHandler(w http.ResponseWriter, r *http.Request) {

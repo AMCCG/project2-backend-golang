@@ -3,7 +3,7 @@ package utils
 import (
 	"testing"
 
-	"github.com/AMCCG/project-2-backend-golang/structure"
+	"project-2-backend-golang/structure"
 )
 
 func TestReflection(t *testing.T) {
